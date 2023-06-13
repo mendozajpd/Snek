@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class SnakeMovement : MonoBehaviour
 {
+    // Movetime
+    public float MoveTime = 0;
+
+    //
     [SerializeField] private Rigidbody2D _rb;
     [SerializeField] private float _moveSpeed = 0; // Determines how fast the snake will move
     [SerializeField] private int _moveDistance = 0;
-    private float _moveTime = 0;
+    private SnakeLocationHandler snakeLocation;
     private bool goingUp;
     private bool goingDown;
     private bool goingRight;
@@ -15,24 +19,20 @@ public class SnakeMovement : MonoBehaviour
 
     // Direction Variables
     private bool lastDirectionHorizontal;
-    
+
+
     void Start()
     {
-        _moveTime = _moveSpeed;
-        
+        snakeLocation = GetComponent<SnakeLocationHandler>();
+        MoveTime = _moveSpeed;
     }
 
     void Update()
     {
-        // user controls
         userControlHandler();
         _moveTimerHandler();
     }
 
-    private void FixedUpdate()
-    {
-        // move the snake
-    }
 
     private void userControlHandler()
     {
@@ -71,15 +71,12 @@ public class SnakeMovement : MonoBehaviour
 
     }
 
-
-
-    // make timer for movement
-    // make snake move 1 depending on how fast the difficulty is
-
     private void _moveTimerHandler ()
     {
-        if (_moveTime <= 0)
+        if (MoveTime <= 0)
         {
+            snakeLocation.LastLocation = transform.position;
+
             if (goingUp)
             {
                 Vector3 newPosition = _rb.transform.position + new Vector3(0f, _moveDistance,0f);
@@ -108,12 +105,12 @@ public class SnakeMovement : MonoBehaviour
                 lastDirectionHorizontal = true;
             }
 
-            _moveTime = _moveSpeed;
+            MoveTime = _moveSpeed;
         }
 
-        if (_moveTime > 0)
+        if (MoveTime > 0)
         {
-            _moveTime -= Time.deltaTime;
+            MoveTime -= Time.deltaTime;
         }
     }
 

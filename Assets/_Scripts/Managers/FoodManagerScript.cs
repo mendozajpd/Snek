@@ -27,7 +27,7 @@ public class FoodManagerScript : MonoBehaviour
 
     private void _spawnFruit ()
     {
-        int randomX = Mathf.RoundToInt(Random.Range(-30, 30));
+        int randomX = Mathf.RoundToInt(Random.Range(-25, 25));
         int randomY = Mathf.RoundToInt(Random.Range(-13, 13));
 
         Vector2 randomPos = new Vector2(randomX, randomY);
