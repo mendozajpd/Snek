@@ -4,18 +4,22 @@ using UnityEngine;
 
 public class SnakeMovement : MonoBehaviour
 {
+    // Difficulty
+    public int gameDifficulty;
+
     // Movetime
-    public float MoveTime = 0;
+    private float _moveTime = 0;
 
     //
     [SerializeField] private Rigidbody2D _rb;
-    [SerializeField] private float _moveSpeed = 0; // Determines how fast the snake will move
     [SerializeField] private int _moveDistance = 0;
+    private float _moveSpeed = 0; // Determines how fast the snake will move
     private SnakeLocationHandler snakeLocation;
     private bool goingUp;
     private bool goingDown;
     private bool goingRight;
     private bool goingLeft;
+    
 
     // Direction Variables
     private bool lastDirectionHorizontal;
@@ -24,8 +28,13 @@ public class SnakeMovement : MonoBehaviour
     void Start()
     {
         snakeLocation = GetComponent<SnakeLocationHandler>();
-        MoveTime = _moveSpeed;
+
+        _setGameDifficulty();
+
+        _moveTime = _moveSpeed;
     }
+
+
 
     void Update()
     {
@@ -66,14 +75,13 @@ public class SnakeMovement : MonoBehaviour
             goingDown = false;
             goingLeft = false;
             goingRight = true;
-            
         }
 
     }
 
     private void _moveTimerHandler ()
     {
-        if (MoveTime <= 0)
+        if (_moveTime <= 0)
         {
             snakeLocation.LastLocation = transform.position;
 
@@ -82,6 +90,7 @@ public class SnakeMovement : MonoBehaviour
                 Vector3 newPosition = _rb.transform.position + new Vector3(0f, _moveDistance,0f);
                 _rb.transform.position = newPosition;
                 lastDirectionHorizontal = false;
+                
             }
 
             if (goingDown)
@@ -89,6 +98,7 @@ public class SnakeMovement : MonoBehaviour
                 Vector3 newPosition = _rb.transform.position - new Vector3(0f, _moveDistance);
                 _rb.transform.position = newPosition;
                 lastDirectionHorizontal = false;
+                
             }
 
             if (goingLeft)
@@ -105,15 +115,33 @@ public class SnakeMovement : MonoBehaviour
                 lastDirectionHorizontal = true;
             }
 
-            MoveTime = _moveSpeed;
+            _moveTime = _moveSpeed;
         }
 
-        if (MoveTime > 0)
+        if (_moveTime > 0)
         {
-            MoveTime -= Time.deltaTime;
+            _moveTime -= Time.deltaTime;
         }
     }
 
-    
+    private void _setGameDifficulty()
+    {
+        switch (gameDifficulty)
+        {
+            case 1:
+                _moveSpeed = 0.3f;
+                break;
+            case 2:
+                _moveSpeed = 0.2f;
+                break;
+            case 3:
+                _moveSpeed = 0.1f;
+                break;
+            default:
+                gameDifficulty = 3;
+                break;
+        }
+    }
+
 
 }

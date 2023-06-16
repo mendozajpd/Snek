@@ -17,6 +17,16 @@ public class FruitScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.gameObject.tag == "Head")
+        {
+            _fruitEaten();
+        }
+
+
+    }
+
+    private void _fruitEaten()
+    {
         score.CurrentScore += 1;
         Destroy(gameObject);
     }

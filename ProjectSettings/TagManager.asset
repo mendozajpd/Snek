@@ -9,6 +9,7 @@ TagManager:
   - Food
   - Border
   - Head
+  - Segment
   layers:
   - Default
   - TransparentFX

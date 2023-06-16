@@ -10,7 +10,8 @@ public class SnakeSegmentScript : MonoBehaviour
     // Lead Segment Location Handler
     public SnakeLocationHandler _leadSnakeLocation;
 
-    private SnakeMovement _moveTime;
+    private SpriteRenderer _spriteRenderer;
+
 
     private void Awake()
     {
@@ -18,8 +19,8 @@ public class SnakeSegmentScript : MonoBehaviour
         if (gameObject.tag != "Head")
         {
             _leadSnakeLocation = _snakeLocation.LeadGameObject.GetComponent<SnakeLocationHandler>();
+            _spriteRenderer = GetComponent<SpriteRenderer>();
         }
-        _moveTime = GameObject.FindGameObjectWithTag("Head").GetComponent<SnakeMovement>();
     }
     void Start()
     {
@@ -30,14 +31,11 @@ public class SnakeSegmentScript : MonoBehaviour
     {
         if (gameObject.tag != "Head")
         {
-            if(_moveTime.MoveTime <= 0)
-            {
-                _followParentSegment();
-            }
-
-            //if (gameObject.transform.position == _snakeLocation.LastLocation)
+            //if(_moveTime.MoveTime <= 0)
             //{
             //}
+
+                _followParentSegment();
         }
     }
 
@@ -46,7 +44,17 @@ public class SnakeSegmentScript : MonoBehaviour
         // Sets current location to last location before changing location
         _snakeLocation.LastLocation = gameObject.transform.position;
         // Makes last parent location to current location
-        gameObject.transform.position = _leadSnakeLocation.LastLocation;
+        if (_leadSnakeLocation.gameObject.transform.position != _leadSnakeLocation.LastLocation)
+        {
+            gameObject.transform.position = _leadSnakeLocation.LastLocation;
+            
+            if (!_spriteRenderer.enabled)
+            {
+                _spriteRenderer.enabled = true;
+            }
+        }
+
 
     }
+
 }
