@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class SnakeMovement : MonoBehaviour
 {
+    // Game State Variables
+    bool gameStart = true;
+
     // Difficulty
     public int gameDifficulty;
 
@@ -19,10 +22,10 @@ public class SnakeMovement : MonoBehaviour
     private bool goingDown;
     private bool goingRight;
     private bool goingLeft;
-    
+
 
     // Direction Variables
-    private bool lastDirectionHorizontal;
+    private bool lastDirectionHorizontal = true;
 
 
     void Start()
@@ -45,12 +48,18 @@ public class SnakeMovement : MonoBehaviour
 
     private void userControlHandler()
     {
+        
         if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && lastDirectionHorizontal)
         {
             goingUp = true;
             goingDown = false;
             goingLeft = false;
             goingRight = false;
+
+            if (gameStart)
+            {
+                gameStart = false;
+            }
         }
 
         if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && lastDirectionHorizontal)
@@ -59,14 +68,24 @@ public class SnakeMovement : MonoBehaviour
             goingDown = true;
             goingLeft = false;
             goingRight = false;
+            
+            if (gameStart)
+            {
+                gameStart = false;
+            }
         }
 
-        if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && !lastDirectionHorizontal)
+        if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && !lastDirectionHorizontal || (gameStart && (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))))
         {
             goingUp = false;
             goingDown = false;
             goingLeft = true;
             goingRight = false;
+
+            if (gameStart)
+            {
+                gameStart = false;
+            }
         }
 
         if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && !lastDirectionHorizontal)
@@ -136,6 +155,9 @@ public class SnakeMovement : MonoBehaviour
                 break;
             case 3:
                 _moveSpeed = 0.1f;
+                break;
+            case 4:
+                _moveSpeed = 0.05f;
                 break;
             default:
                 gameDifficulty = 3;

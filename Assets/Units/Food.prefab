@@ -124,3 +124,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cbc20aef44e108448bd67b32d4fda3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pulseSettings: {fileID: 11400000, guid: bf8e1dfd280499a4db6596ed8b2173f0, type: 2}
+  _pulseTime: 0
