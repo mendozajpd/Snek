@@ -10,6 +10,7 @@ TagManager:
   - Border
   - Head
   - Segment
+  - SettingsButton
   layers:
   - Default
   - TransparentFX
@@ -17,7 +18,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Particles
   - 
   - 
   - 
@@ -52,4 +53,7 @@ TagManager:
     locked: 0
   - name: Snake
     uniqueID: 1828144411
+    locked: 0
+  - name: Particles
+    uniqueID: 3476355689
     locked: 0

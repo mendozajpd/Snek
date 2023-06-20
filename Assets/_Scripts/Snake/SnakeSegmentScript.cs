@@ -18,10 +18,13 @@ public class SnakeSegmentScript : MonoBehaviour
         _snakeLocation = GetComponent<SnakeLocationHandler>();
         if (gameObject.tag != "Head")
         {
-            _leadSnakeLocation = _snakeLocation.LeadGameObject.GetComponent<SnakeLocationHandler>();
+            _getLeadSnake();
             _spriteRenderer = GetComponent<SpriteRenderer>();
         }
     }
+
+
+
     void Start()
     {
 
@@ -29,12 +32,13 @@ public class SnakeSegmentScript : MonoBehaviour
 
     void Update()
     {
-        if (gameObject.tag != "Head")
+        if (_leadSnakeLocation == null)
         {
-            //if(_moveTime.MoveTime <= 0)
-            //{
-            //}
+            _getLeadSnake();
+        }
 
+        if (gameObject.tag != "Head" && _leadSnakeLocation != null)
+        {
                 _followParentSegment();
         }
     }
@@ -55,6 +59,17 @@ public class SnakeSegmentScript : MonoBehaviour
         }
 
 
+    }
+
+    private void _getLeadSnake()
+    {
+        try
+        {
+            _leadSnakeLocation = _snakeLocation.LeadGameObject.GetComponent<SnakeLocationHandler>();
+        } catch
+        {
+            return;
+        }
     }
 
 }

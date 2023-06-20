@@ -6,15 +6,19 @@ public class EatFruitAnimationScript : MonoBehaviour
 {
     private BoxCollider2D boxcoll2d;
 
+    // Fruit Finding Variables
+    private FruitScript _fruit;
+
     // Snake variable
     [SerializeField] private EatFruitAnimationScript _leadSegment;
-    public float _leadSegmentEatSize;
+    public float LeadSegmentEatSize;
     public int Count;
     public bool TransferEatBulge;
+    private SnakeMovement _snakeMovement;
     private bool _eatSize;
 
     // Pulse Settings
-    [SerializeField] PulseSettingsSO pulseSettings;
+    [SerializeField] private PulseSettingsSO _pulseSettings;
 
     // Pulse Variables
     [SerializeField] private float _pulseTime;
@@ -28,26 +32,13 @@ public class EatFruitAnimationScript : MonoBehaviour
 
     private void Awake()
     {
-        if (gameObject.tag == "Head")
-        {
-            boxcoll2d = GetComponent<BoxCollider2D>();
-            Count = 1;
-        }
-
-        if (gameObject.tag == "Segment")
-        {
-            boxcoll2d = GetComponent<BoxCollider2D>();
-            _leadSegment = GetComponent<SnakeLocationHandler>().LeadGameObject.GetComponent<EatFruitAnimationScript>();
-        }
-
-        _snake = GameObject.FindGameObjectWithTag("Head").GetComponent<SnakeScript>();
-
-        _pulseSize = pulseSettings.PulseSize;
-        _pulseFrequency = pulseSettings.PulseFrequency;
-        _originalObjectSize = pulseSettings.OriginalObjectSize;
-        _colliderSize = pulseSettings.ColliderSize;
-        
+        _setHeadAndSegment();
+        _findSnakeComponents();
+        _setPulseSettings();
     }
+
+
+
     void Start()
     {
 
@@ -55,12 +46,86 @@ public class EatFruitAnimationScript : MonoBehaviour
 
     void Update()
     {
+        if(_leadSegment == null && gameObject.tag != "Head")
+        {
+            _setHeadAndSegment();
+        } else
+        {
+            _findSetFruit();
+            _widenMouthAnimation();
+            _segmentCounter();
+            _pulseAnimationHandler();
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Food")
+        {
+            _pulseTime = _pulseFrequency;
+        }
+    }
+
+    private void _widenMouthAnimation()
+    {
+        if (gameObject.tag == "Head" && _fruit != null)
+        {
+            float distance = Vector3.Distance(gameObject.transform.position, _fruit.transform.position);
+            float minDistance = 0;
+            float maxDistance = 8;
+            float minScale = 1;
+            float maxScale = 1.5f;
+
+            float normalizedDistance = Mathf.Clamp01((distance - minDistance) / (maxDistance - minDistance));
+            float scaleValue = Mathf.Lerp(maxScale, minScale, normalizedDistance);
+
+            if (distance < maxDistance)
+            {
+                if (!_snakeMovement.LastDirectionHorizontal)
+                {
+                    gameObject.transform.localScale = new Vector2(scaleValue, 1);
+                }
+
+                if (_snakeMovement.LastDirectionHorizontal)
+                {
+                    gameObject.transform.localScale = new Vector2(1, scaleValue);
+                }
+            }
+            else
+            {
+                gameObject.transform.localScale = new Vector2(1, 1);
+            }
+
+        }
+    }
+
+    private void _findSetFruit()
+    {
+        if (_fruit == null)
+        {
+            try
+            {
+                _fruit = GameObject.FindGameObjectWithTag("Food").GetComponent<FruitScript>();
+            }
+            catch
+            {
+                Debug.Log("No fruit found.");
+            }
+        }
+    }
+
+    private void _findSnakeComponents()
+    {
+        _snake = GameObject.FindGameObjectWithTag("Head").GetComponent<SnakeScript>();
+        _snakeMovement = GetComponent<SnakeMovement>();
+    }
+
+    private void _segmentCounter()
+    {
         if (gameObject.tag == "Segment" && Count != _leadSegment.Count + 1)
         {
             Count = _leadSegment.Count + 1;
         }
-
-        _pulseAnimationHandler();
     }
 
     private void _pulseAnimationHandler()
@@ -105,13 +170,37 @@ public class EatFruitAnimationScript : MonoBehaviour
             }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void _setHeadAndSegment()
     {
-        if (collision.gameObject.tag == "Food")
+        if (gameObject.tag == "Head")
+            {
+                boxcoll2d = GetComponent<BoxCollider2D>();
+                Count = 1;
+            }
+
+          
+        if (gameObject.tag == "Segment")
         {
-            _pulseTime = _pulseFrequency;
-            Debug.Log("YES");
+            boxcoll2d = GetComponent<BoxCollider2D>();
+            try
+            {
+                _leadSegment = GetComponent<SnakeLocationHandler>().LeadGameObject.GetComponent<EatFruitAnimationScript>();
+            } catch
+            {
+                return;
+            }
         }
+
     }
+
+    private void _setPulseSettings()
+    {
+        _pulseSize = _pulseSettings.PulseSize;
+        _pulseFrequency = _pulseSettings.PulseFrequency;
+        _originalObjectSize = _pulseSettings.OriginalObjectSize;
+        _colliderSize = _pulseSettings.ColliderSize;
+    }
+
+
 
 }

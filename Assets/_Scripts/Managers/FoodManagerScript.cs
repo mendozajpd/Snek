@@ -51,7 +51,7 @@ public class FoodManagerScript : MonoBehaviour
 
         foreach (Vector2 positions in snakeLocations)
         {
-            Debug.Log("Checking for overlaps");
+            //Debug.Log("Checking for overlaps");
             if (positions == randomPos)
             {
                 Debug.Log("POSITION OVERLAPPED. WILL GET ANOTHER RANDOM POS.");

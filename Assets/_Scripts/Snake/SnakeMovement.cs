@@ -13,7 +13,7 @@ public class SnakeMovement : MonoBehaviour
     // Movetime
     private float _moveTime = 0;
 
-    //
+    // Direction Handling Variables
     [SerializeField] private Rigidbody2D _rb;
     [SerializeField] private int _moveDistance = 0;
     private float _moveSpeed = 0; // Determines how fast the snake will move
@@ -22,11 +22,19 @@ public class SnakeMovement : MonoBehaviour
     private bool goingDown;
     private bool goingRight;
     private bool goingLeft;
+    private bool justMoved;
+
+    // Audio Handling Variables
+    [SerializeField] private AudioSource _move1;
+    [SerializeField] private AudioSource _move2;
+    private int _audioCount = 1;
+
 
 
     // Direction Variables
     private bool lastDirectionHorizontal = true;
 
+    public bool LastDirectionHorizontal { get => lastDirectionHorizontal; }
 
     void Start()
     {
@@ -43,6 +51,7 @@ public class SnakeMovement : MonoBehaviour
     {
         userControlHandler();
         _moveTimerHandler();
+        _audioHandler();
     }
 
 
@@ -108,7 +117,11 @@ public class SnakeMovement : MonoBehaviour
             {
                 Vector3 newPosition = _rb.transform.position + new Vector3(0f, _moveDistance,0f);
                 _rb.transform.position = newPosition;
-                lastDirectionHorizontal = false;
+                if(lastDirectionHorizontal)
+                {
+                    lastDirectionHorizontal = false;
+                    justMoved = true;
+                }
                 
             }
 
@@ -116,22 +129,33 @@ public class SnakeMovement : MonoBehaviour
             {
                 Vector3 newPosition = _rb.transform.position - new Vector3(0f, _moveDistance);
                 _rb.transform.position = newPosition;
-                lastDirectionHorizontal = false;
-                
+                if (lastDirectionHorizontal)
+                {
+                    lastDirectionHorizontal = false;
+                    justMoved = true;
+                }
             }
 
             if (goingLeft)
             {
                 Vector3 newPosition = _rb.transform.position - new Vector3(_moveDistance, 0f);
                 _rb.transform.position = newPosition;
-                lastDirectionHorizontal = true;
+                if (!lastDirectionHorizontal)
+                {
+                    lastDirectionHorizontal = true;
+                    justMoved = true;
+                }
             }
           
             if (goingRight)
             {
                 Vector3 newPosition = _rb.transform.position + new Vector3(_moveDistance, 0f);
                 _rb.transform.position = newPosition;
-                lastDirectionHorizontal = true;
+                if (!lastDirectionHorizontal)
+                {
+                    lastDirectionHorizontal = true;
+                    justMoved = true;
+                }
             }
 
             _moveTime = _moveSpeed;
@@ -165,5 +189,26 @@ public class SnakeMovement : MonoBehaviour
         }
     }
 
+    private void _audioHandler()
+    {
+        if (justMoved)
+        {
+            if (_audioCount == 1)
+            {
+                _move1.Play();
+                _audioCount *= -1;
+                justMoved = false;
+                return;
+            }
+
+            if (_audioCount == -1)
+            {
+                _move2.Play();
+                _audioCount *= -1;
+                justMoved = false;
+                return;
+            }
+        }
+    }
 
 }

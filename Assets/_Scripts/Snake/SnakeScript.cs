@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class SnakeScript : MonoBehaviour
 {
+    [SerializeField] private AudioSource _chompSound;
     [SerializeField] private List<GameObject> _snakeSegments;
     [SerializeField] private GameObject _snakeSegmentPrefab;
     [SerializeField] private GameObject _snakeSegmentPrefab2;
 
     // Segment Changer
-    private int segmentColor = -1;
+    private int _segmentColor = -1;
 
-    private string LoseGame = "Ouchie";
+    private string _loseGame = "Ouchie";
 
     public List<GameObject> SnakeSegments { get => _snakeSegments;}
 
@@ -19,39 +20,40 @@ public class SnakeScript : MonoBehaviour
     {
         if(collision.gameObject.tag == "Food")
         {
-            SegmentHandler();
+            _chompSound.Play();
+            _segmentHandler();
             Debug.Log("NOMNOM");
         }
 
         if (collision.gameObject.tag == "Border")
         {
-            Debug.Log(LoseGame);
+            Debug.Log(_loseGame);
         }
 
         if(collision.gameObject.tag == "Segment")
         {
-            Debug.Log(LoseGame);
+            Debug.Log(_loseGame);
 
         }
     }
 
-    private void SegmentHandler()
+    private void _segmentHandler()
     {
-        if (segmentColor == -1)
+        if (_segmentColor == -1)
         {
             GameObject newSegment = Instantiate(_snakeSegmentPrefab, gameObject.transform.parent.transform);
             newSegment.name = "Snake Segment" + _snakeSegments.Count;
             SnakeSegments.Add(newSegment);
-            segmentColor *= -1;
+            _segmentColor *= -1;
             return;
         }
 
-        if (segmentColor == 1)
+        if (_segmentColor == 1)
         {
             GameObject newSegment = Instantiate(_snakeSegmentPrefab2, gameObject.transform.parent.transform);
             newSegment.name = "Snake Segment" + _snakeSegments.Count;
             SnakeSegments.Add(newSegment);
-            segmentColor *= -1;
+            _segmentColor *= -1;
             return;
         }
     }

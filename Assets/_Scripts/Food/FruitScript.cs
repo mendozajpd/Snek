@@ -7,8 +7,11 @@ public class FruitScript : MonoBehaviour
     // Pulse Settings
     [SerializeField] PulseSettingsSO pulseSettings;
 
+    // Death Particles
+    [SerializeField] GameObject deathParticles;
+
     // Pulse Variables
-    [SerializeField] private float _pulseTime;
+    private float _pulseTime;
     private float _pulseSize;
     private float _pulseFrequency;
     private float _originalObjectSize;
@@ -42,6 +45,7 @@ public class FruitScript : MonoBehaviour
     private void _fruitEaten()
     {
         _score.CurrentScore += 1;
+        Instantiate(deathParticles,gameObject.transform.position, Quaternion.identity);
         Destroy(gameObject);
     }
 
