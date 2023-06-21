@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EatFruitAnimationScript : MonoBehaviour
+public class PulseAnimationScript : MonoBehaviour
 {
     private BoxCollider2D boxcoll2d;
 
@@ -10,15 +10,17 @@ public class EatFruitAnimationScript : MonoBehaviour
     private FruitScript _fruit;
 
     // Snake variable
-    [SerializeField] private EatFruitAnimationScript _leadSegment;
+    [SerializeField] private PulseAnimationScript _leadSegment;
     public float LeadSegmentEatSize;
     public int Count;
-    public bool TransferEatBulge;
+    public bool TransferBulge;
     private SnakeMovement _snakeMovement;
     private bool _eatSize;
+    private bool _isDead = false;
 
     // Pulse Settings
     [SerializeField] private PulseSettingsSO _pulseSettings;
+    [SerializeField] private PulseSettingsSO _deathPulseSettings;
 
     // Pulse Variables
     [SerializeField] private float _pulseTime;
@@ -46,7 +48,7 @@ public class EatFruitAnimationScript : MonoBehaviour
 
     void Update()
     {
-        if(_leadSegment == null && gameObject.tag != "Head")
+        if (_leadSegment == null && gameObject.tag != "Head")
         {
             _setHeadAndSegment();
         } else
@@ -54,7 +56,14 @@ public class EatFruitAnimationScript : MonoBehaviour
             _findSetFruit();
             _widenMouthAnimation();
             _segmentCounter();
-            _pulseAnimationHandler();
+
+            if (_isDead)
+            {
+                _deathPulseAnimationHandler();
+            } else
+            {
+                _pulseAnimationHandler();
+            }
         }
     }
 
@@ -62,6 +71,12 @@ public class EatFruitAnimationScript : MonoBehaviour
     {
         if (collision.gameObject.tag == "Food")
         {
+            _pulseTime = _pulseFrequency;
+        }
+
+        if (collision.gameObject.tag == "Border" || collision.gameObject.tag == "Segment")
+        {
+            _isDead = true;
             _pulseTime = _pulseFrequency;
         }
     }
@@ -99,6 +114,7 @@ public class EatFruitAnimationScript : MonoBehaviour
         }
     }
 
+    #region Declaring Variables
     private void _findSetFruit()
     {
         if (_fruit == null)
@@ -128,16 +144,51 @@ public class EatFruitAnimationScript : MonoBehaviour
         }
     }
 
+    private void _setHeadAndSegment()
+    {
+        if (gameObject.tag == "Head")
+        {
+            boxcoll2d = GetComponent<BoxCollider2D>();
+            Count = 1;
+        }
+
+
+        if (gameObject.tag == "Segment")
+        {
+            boxcoll2d = GetComponent<BoxCollider2D>();
+            try
+            {
+                _leadSegment = GetComponent<SnakeLocationHandler>().LeadGameObject.GetComponent<PulseAnimationScript>();
+            }
+            catch
+            {
+                return;
+            }
+        }
+
+    }
+
+    private void _setPulseSettings()
+    {
+        _pulseSize = _pulseSettings.PulseSize;
+        _pulseFrequency = _pulseSettings.PulseFrequency;
+        _originalObjectSize = _pulseSettings.OriginalObjectSize;
+        _colliderSize = _pulseSettings.ColliderSize;
+    }
+
+    #endregion
+
+    #region PulseAnimations
     private void _pulseAnimationHandler()
     {
         if (_pulseTime <= _pulseFrequency/Count && _pulseTime > 0)
         {
-            TransferEatBulge = true;
+            TransferBulge = true;
         }
 
        if (_leadSegment != null)
         {
-            if (_leadSegment.TransferEatBulge)
+            if (_leadSegment.TransferBulge)
             {
                 _pulseTime = _pulseFrequency;
             }
@@ -147,11 +198,11 @@ public class EatFruitAnimationScript : MonoBehaviour
         {
             if (_leadSegment != null)
             {
-                _leadSegment.TransferEatBulge = false;
-                TransferEatBulge = false;
+                _leadSegment.TransferBulge = false;
+                TransferBulge = false;
             } else
             {
-                TransferEatBulge = false;
+                TransferBulge = false;
             }
         }
 
@@ -170,36 +221,51 @@ public class EatFruitAnimationScript : MonoBehaviour
             }
     }
 
-    private void _setHeadAndSegment()
+    private void _deathPulseAnimationHandler()
     {
-        if (gameObject.tag == "Head")
-            {
-                boxcoll2d = GetComponent<BoxCollider2D>();
-                Count = 1;
-            }
-
-          
-        if (gameObject.tag == "Segment")
+        if (_pulseTime <= _pulseFrequency / Count && _pulseTime > 0)
         {
-            boxcoll2d = GetComponent<BoxCollider2D>();
-            try
+            TransferBulge = true;
+        }
+
+        if (_leadSegment != null)
+        {
+            if (_leadSegment.TransferBulge)
             {
-                _leadSegment = GetComponent<SnakeLocationHandler>().LeadGameObject.GetComponent<EatFruitAnimationScript>();
-            } catch
-            {
-                return;
+                _pulseTime = _pulseFrequency;
             }
         }
 
+        if (_pulseTime <= 0)
+        {
+            if (_leadSegment != null)
+            {
+                _leadSegment.TransferBulge = false;
+                TransferBulge = false;
+            }
+            else
+            {
+                TransferBulge = false;
+            }
+        }
+
+        if (_pulseTime > 0)
+        {
+            _pulseTime -= Time.deltaTime;
+
+            if (boxcoll2d.size != new Vector2(_colliderSize, _colliderSize))
+            {
+                boxcoll2d.size = new Vector2(_colliderSize, _colliderSize);
+            }
+
+            // This pulses the object
+            Vector3 _pulse = new Vector3((_deathPulseSettings.PulseSize * (_pulseTime / _deathPulseSettings.PulseFrequency)) * ((_snake.SnakeSegments.Count - Count + 1) / (float)_snake.SnakeSegments.Count), (_deathPulseSettings.PulseSize * (_pulseTime / _deathPulseSettings.PulseFrequency)) * ((_snake.SnakeSegments.Count - Count + 1) / (float)_snake.SnakeSegments.Count));
+            gameObject.transform.localScale = new Vector3(_deathPulseSettings.OriginalObjectSize, _deathPulseSettings.OriginalObjectSize) + _pulse;
+        }
     }
 
-    private void _setPulseSettings()
-    {
-        _pulseSize = _pulseSettings.PulseSize;
-        _pulseFrequency = _pulseSettings.PulseFrequency;
-        _originalObjectSize = _pulseSettings.OriginalObjectSize;
-        _colliderSize = _pulseSettings.ColliderSize;
-    }
+    #endregion
+
 
 
 

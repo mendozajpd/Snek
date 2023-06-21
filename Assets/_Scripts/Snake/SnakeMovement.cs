@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class SnakeMovement : MonoBehaviour
 {
+    // Snake Variables
+    private SnakeScript _snake;
+
     // Game State Variables
     bool gameStart = true;
 
@@ -35,6 +38,7 @@ public class SnakeMovement : MonoBehaviour
     private bool lastDirectionHorizontal = true;
 
     public bool LastDirectionHorizontal { get => lastDirectionHorizontal; }
+    public bool GameStart { get => gameStart; }
 
     void Start()
     {
@@ -49,13 +53,19 @@ public class SnakeMovement : MonoBehaviour
 
     void Update()
     {
-        userControlHandler();
-        _moveTimerHandler();
-        _audioHandler();
+        _getSnakeScript();
+
+        if (_snake != null && !_snake.IsDead)
+        {
+            _userControlHandler();
+            _moveTimerHandler();
+            _audioHandler();
+        }
     }
 
 
-    private void userControlHandler()
+
+    private void _userControlHandler()
     {
         
         if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && lastDirectionHorizontal)
@@ -207,6 +217,20 @@ public class SnakeMovement : MonoBehaviour
                 _audioCount *= -1;
                 justMoved = false;
                 return;
+            }
+        }
+    }
+
+    private void _getSnakeScript()
+    {
+        if (_snake == null)
+        {
+            try
+            {
+                _snake = GetComponent<SnakeScript>();
+            }
+            catch
+            {
             }
         }
     }
